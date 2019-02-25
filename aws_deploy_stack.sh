@@ -93,8 +93,8 @@ fi
 aws_command="aws cloudformation deploy \\
     --template-file ${TEMPLATE_FILE} \\
     --stack-name ${STACK_NAME} \\
-    --parameter-overrides ${STACK_PARAMS%% *} \\
-    --tags ${STACK_TAGS%% *} \\
+    --parameter-overrides ${STACK_PARAMS%% } \\
+    --tags ${STACK_TAGS%% } \\
     --no-fail-on-empty-changeset"
 
 cat <<- EOC
