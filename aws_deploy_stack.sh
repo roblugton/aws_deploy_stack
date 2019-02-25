@@ -14,6 +14,21 @@ aws_deploy_stack (-t|--template) <template file> (-s|--stackname) <stack name> [
 EOF
 }
 
+parse_yaml () {
+    local YAML_FILE=${1}
+    local PARAM_TO_SET=${2}
+    
+    if [[ ! -f ${YAML_FILE} ]]
+    then 
+        echo "ERROR: Unable to find file '${YAML_FILE}' for parsing!"
+        exit 1
+    fi
+
+    local output=$(cat ${YAML_FILE}|grep -v -e '---'|grep -v '#'|sed -e "s/:[^:\/\/]/='/g;s/$/'/g;s/ *=/=/g"|tr '\n' ' ')
+    echo "OUTPUT: ${output}"
+    eval "${PARAM_TO_SET}=\"${output}\""
+}
+
 while (( $# ));
 do
     case "${1}" in
@@ -29,6 +44,7 @@ do
     shift
 done    
 
+# echo params so people know what they're setting
 cat <<-EOF
 =====================
 PARAMETERS:
@@ -39,3 +55,42 @@ tags:       ${TAGS_FILE:-Not Set}
 dryrun:     ${DRY_RUN:-false}
 =====================
 EOF
+
+# validate required params
+if [[ ! -f ${TEMPLATE_FILE} ]]
+then
+    echo "ERROR: template '${TEMPLATE_FILE}' does not exist!'"
+    exit 1
+fi
+
+if [[ -z "${STACK_NAME}" ]]
+then 
+    echo "ERROR: stack name not set!"
+    exit 1
+fi
+
+if [[ -n ${PARAMETERS_FILE} ]]
+then
+    echo "Parsing parameters file"
+    parse_yaml ${PARAMETERS_FILE} STACK_PARAMS
+fi
+
+if [[ -n ${TAGS_FILE} ]]
+then
+    echo "Parsing tags file"
+    parse_yaml ${TAGS_FILE} STACK_TAGS
+fi
+
+echo "STACK_PARAMS: '${STACK_PARAMS}'"
+echo "STACK_TAGS: '${STACK_TAGS}'"
+
+aws_command="aws cloudformation deploy \\
+    --template-file ${TEMPLATE_FILE} \\
+    --stack-name ${STACK_NAME} \\
+    --parameter-overrides ${STACK_PARAMS%% *} \\
+    --tags ${STACK_TAGS%% *} \\
+    --no-fail-on-empty-changeset
+"
+
+echo "AWS COMMAND:
+${aws_command}"
