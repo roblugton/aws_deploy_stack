@@ -108,4 +108,6 @@ if [[ -z ${DRY_RUN} ]]
 then
     # echo "Doin' the AWS thang!"
     eval "${aws_command}"
+else
+    echo "DRYRUN: not executing anything."
 fi
