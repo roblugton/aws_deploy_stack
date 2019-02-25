@@ -1,0 +1,17 @@
+---
+Description: Sample Stack to demo aws_deploy_stack.sh script
+
+Parameters: 
+  GreetingName:
+    Type: String
+    Description: String to use in the greeting output
+
+Resources:
+  # nothing here
+
+Outputs:
+  Greeting:
+    Description: Greeting
+    Export: 
+      Name: !Sub ${AWS::StackName}-GreetingString
+    Value: !Sub "Hello ${GreetingName}"
