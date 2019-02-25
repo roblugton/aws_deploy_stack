@@ -25,7 +25,7 @@ parse_yaml () {
     fi
 
     local output=$(cat ${YAML_FILE}|grep -v -e '---'|grep -v '#'|sed -e "s/:[^:\/\/]/='/g;s/$/'/g;s/ *=/=/g"|tr '\n' ' ')
-    echo "OUTPUT: ${output}"
+    # echo "OUTPUT: ${output}"
     eval "${PARAM_TO_SET}=\"${output}\""
 }
 
@@ -81,16 +81,25 @@ then
     parse_yaml ${TAGS_FILE} STACK_TAGS
 fi
 
-echo "STACK_PARAMS: '${STACK_PARAMS}'"
-echo "STACK_TAGS: '${STACK_TAGS}'"
+# echo "STACK_PARAMS: '${STACK_PARAMS}'"
+# echo "STACK_TAGS: '${STACK_TAGS}'"
 
 aws_command="aws cloudformation deploy \\
     --template-file ${TEMPLATE_FILE} \\
     --stack-name ${STACK_NAME} \\
     --parameter-overrides ${STACK_PARAMS%% *} \\
     --tags ${STACK_TAGS%% *} \\
-    --no-fail-on-empty-changeset
-"
+    --no-fail-on-empty-changeset"
 
-echo "AWS COMMAND:
-${aws_command}"
+cat <<- EOC
+=====================
+AWS COMMAND:
+${aws_command}
+=====================
+EOC
+
+if [[ -z ${DRY_RUN} ]]
+then
+    # echo "Doin' the AWS thang!"
+    eval "${aws_command}"
+fi
