@@ -10,5 +10,6 @@ aws_deploy_stack.sh \
     --template template_file.yaml \
     --parameters parameters_file.yaml \
     --tags tags_file.yaml \
+    --stackname test_stack \
     --dry-run
 ```
