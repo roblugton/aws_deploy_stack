@@ -7,7 +7,8 @@ Parameters:
     Description: String to use in the greeting output
 
 Resources:
-  # nothing here
+  EmptyBucket:
+    Type: AWS::S3::Bucket
 
 Outputs:
   Greeting:
