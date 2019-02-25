@@ -1,2 +1,3 @@
 ---
+# you cam have comments in your yaml file and they will be ignored
 GreetingName: User
