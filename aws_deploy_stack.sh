@@ -24,6 +24,12 @@ parse_yaml () {
         exit 1
     fi
 
+    # ok, this'll need a bit of explaining :) 
+    # cat ${YAML_FILE} - read the file
+    # grep -v -e '---'  - ignore any lines with '---' (well formed yaml)'
+    # grep -v '#' - ignore any comments
+    # sed -e "s/:[^:\/\/]/='/g;s/$/'/g;s/ *=/=/g" - sed magic to replace ': ' with '=' and enclose the value in single quotes
+    # tr '\n' ' ' - replace newlines with spaces cos we want everything on one line
     local output=$(cat ${YAML_FILE}|grep -v -e '---'|grep -v '#'|sed -e "s/:[^:\/\/]/='/g;s/$/'/g;s/ *=/=/g"|tr '\n' ' ')
     # echo "OUTPUT: ${output}"
     eval "${PARAM_TO_SET}=\"${output}\""
